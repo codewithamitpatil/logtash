@@ -1,25 +1,20 @@
 version: "3"
 services:
     logstash:
-    image: docker.elastic.co/logstash/logstash:7.15.0
-    ports:
-      - "5044:5044"
-      - "5000:5000"
-      - "9600:9600"
-    volumes:
-          - .\logstash:/usr/share/logstash/pipeline/logstash.conf  
-    configs:
-      - source: logstash_config
-        target: /usr/share/logstash/config/logstash.yml
-      - source: logstash_pipeline
-        target: /usr/share/logstash/pipeline/logstash.conf
-    environment:
-      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
-    networks:
-      - elk
-    deploy:
-      mode: replicated
-      replicas: 1
+        image: logstash:7.15.0
+        container_name: logstash
+        hostname: logstash
+        ports:
+            - 9600:9600
+            - 8089:8089
+        volumes:
+          - .\logstash:/usr/share/logstash/pipeline/
+        links:
+            - elasticsearch:elasticsearch
+        depends_on:
+          - elasticsearch
+        networks:
+          - elknetwork
 networks:
     elknetwork:
         driver: bridge
